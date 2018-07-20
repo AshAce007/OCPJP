@@ -1,0 +1,188 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<!-- Basic -->
+<meta charset="UTF-8" />
+
+<title>Summary Graph generation</title>
+<meta name="keywords" content="HTML5 Admin Template" />
+<meta name="author" content="fahim.fahad" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
+	href="../../css/bootstrap.min.css" />
+<link rel="stylesheet" th:href="@{/css/iaudit.css}"
+	href="../../css/iaudit.css" />
+<link rel="stylesheet" th:href="@{/css/font-awesome.min.css}"
+	href="../../css/font-awesome.min.css" />
+<link rel="stylesheet" th:href="@{/css/bootstrap-glyphicons.css}"
+	href="../../css/bootstrap-glyphicons.css" />
+<link rel="stylesheet" th:href="@{/css/theme.css}"
+	href="../../css/theme.css" />
+<link rel="stylesheet" th:href="@{/css/admintemplate.css}"
+	href="../../css/admintemplate.css" />
+<link rel="stylesheet" th:href="@{/css/default.css}"
+	href="../../css/default.css" />
+<link rel="stylesheet" th:href="@{/css/theme-custom.css}"
+	href="../../css/theme-custom.css" />
+
+<style>
+body {
+	/* 	width: 1060px; */
+	/* margin: 50px auto; */
+	
+}
+
+path {
+	stroke: #fff;
+}
+
+path:hover {
+	opacity: 0.9;
+}
+
+rect:hover {
+	fill: blue;
+}
+
+.axis {
+	font: 10px sans-serif;
+}
+
+.legend tr {
+	border-bottom: 1px solid grey;
+}
+
+.legend tr:first-child {
+	border-top: 1px solid grey;
+}
+
+.axis path, .axis line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+
+.x.axis path {
+	display: none;
+}
+
+.legend {
+	margin-bottom: 76px;
+	display: inline-block;
+	border-collapse: collapse;
+	border-spacing: 0px;
+}
+
+.legend td {
+	padding: 4px 5px;
+	vertical-align: bottom;
+}
+
+.legendFreq, .legendPerc {
+	align: right;
+	width: 50px;
+}
+</style>
+
+
+<script type="text/javascript" th:src="@{/script/modernizr.js}"
+	src="../../script/modernizr.js"></script>
+
+</head>
+<body class="fixed sidebar-left-collapsed">
+
+	<section class="body" style="background-color: #FFF">
+		<div id="loader2" style="display: none">Loading&#8230;</div>
+		<div class="inner-wrapper">
+			<div th:replace="fragments/header :: header"></div>
+			<div th:replace="fragments/nav-bar-options:: nav-bar-options"></div>
+			<section role="main" class="content-body">
+				<input type="hidden" id="productName" name="productName" th:value="${productName}"/>
+				<input type="hidden" id="subProductName" name="subProductName" th:value="${subProductName}"/>
+				<input type="hidden" id="productId" name="productId" th:value="${productId}"/>
+				<input type="hidden" id="subProductId" name="subProductId" th:value="${subProductId}"/>
+				<input type="hidden" id="ppm" name="identifier" th:value="${ppm}"/>
+				<input type="hidden" id="app" name="identifier" th:value="${app}"/>
+				<input type="hidden" id="matching" name="identifier"
+					th:value="${matching}" /> <input type="hidden" id="list"
+					name="identifier" th:value="${list}" /> <input type="hidden"
+					id="list2" name="identifier" th:value="${list2}" /> <input
+					type="hidden" id="name" name="identifier" th:value="${name}" /> <input
+					type="hidden" id="inactiveUser" name="inactiveUser"
+					th:value="${inactiveUser}" />
+
+				<fieldset class="form-group">
+					<legend>
+						Summary Graph generation <span th:text="${name}"></span>
+					</legend>
+					<div>
+						<b>Product Name : </b><span th:text="${productName}"></span>
+						<b>, Sub Product Name : </b><span th:text="${subProductName}"></span>
+						<br></br>
+						<b>Total PPM User : </b><span th:text="${totalPPMUser}"></span>
+						<b>, Total Application User : </b><span th:text="${totalAppUser}"></span>
+						<br></br>
+						<b>Only PPM User : </b><span th:text="${ppm}"></span>
+						<b>, Only Application User : </b><span th:text="${app}"></span>
+						  <b>, Matching : </b><span th:text="${matching}"></span>
+						<br></br>
+						<b>PPM data date : </b><span th:text="${list}"></span>
+						<b>, Application data date : </b><span th:text="${list2}"></span>
+						<b>, User status : </b><span th:text="${inactiveUserText}"></span>
+					</div>
+					<div id='dashboard' style="padding-left: 100px">
+						<br></br>
+						<p>
+							<span id="value" style="padding-left: 200px; padding-top: 100px"></span>
+						</p>
+					</div>
+
+				</fieldset>
+				 <br />
+				<a
+					th:href="@{~/iAudit/summary_graph_selection}" style="float: right; padding-right: 10px">
+					<button title="Go back to summary graph selection page" onclick="getLastVisitedURL();saveURL();"
+						type="button" class="btn btn-success">
+						Back
+					</button>
+				</a>
+			</section>
+
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+
+	</section>
+
+	<script type="text/javascript" th:src="@{/script/piechartgenerator.js}"
+		src="../../script/piechartgenerator.js"></script>
+	<script type="text/javascript" th:src="@{/script/d3.js}"
+		src="../../script/d3.js"></script>
+	<script type="text/javascript" th:src="@{/script/d3.min.js}"
+		src="../../script/d3.min.js"></script>
+
+	<script>
+		var ppm = $("#ppm").val();
+		var app = $("#app").val();
+		var matching = $("#matching").val();
+		var subProductId = $('#subProductId').val();
+		var a, b, c;
+		a = parseInt(ppm);
+		b = parseInt(app);
+		c = parseInt(matching);
+		var freqData = [ {
+			freq : {
+				app : b,
+				ppm : a,
+				matching : c
+			}
+		} ];
+
+		dashboard('#dashboard', freqData);
+	</script>
+
+</body>
+</html>
